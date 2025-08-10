@@ -1,53 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { AnswerCard } from "./AnswerCard";
-import { Answer } from "@/types/answer";
 import { Skeleton } from "@/components/ui/skeleton";
-import { api } from "@/lib/axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useAnswers } from "@/hooks/answersHooks";
 
 interface AnswerSectionProps {
   questionId: string;
   questionAuthorId: string;
 }
 
-export const AnswerSection = ({ questionId, questionAuthorId }: AnswerSectionProps) => {
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [loading, setLoading] = useState(true);
-    const token = useSelector((state: RootState) => state.auth.token);
-  
-  useEffect(() => {
-    const fetchAnswers = async () => {
-      try {
-        const res = await api.get(`/questions/${questionId}/answers`,{
-        headers: { Authorization: `Bearer ${token}` }
-      });
-        setAnswers(res.data);
-      } catch (err) {
-        console.error("Failed to fetch answers", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+export const AnswerSection = ({
+  questionId,
+  questionAuthorId,
+}: AnswerSectionProps) => {
+  const token = useSelector((state: RootState) => state.auth.token);
 
-    fetchAnswers();
-  }, [questionId,token]);
-
+  const { answers, loading } = useAnswers(questionId, token);
+  console.log('answers',answers)
   if (loading) {
     return (
-      <div className="space-y-4">
-        <Skeleton className="h-20 w-full" />
-        <Skeleton className="h-20 w-full" />
+      <div
+        className="
+          space-y-6
+          rounded-2xl
+          backdrop-blur-lg bg-white/70 dark:bg-zinc-900/60
+          shadow-lg shadow-purple-500/10
+          p-6
+          
+           hover:shadow-xl
+        "
+      >
+        <Skeleton className="h-20 w-full rounded-2xl bg-purple-200/40 dark:bg-purple-800/40 animate-pulse" />
+        <Skeleton className="h-20 w-full rounded-2xl bg-purple-200/40 dark:bg-purple-800/40 animate-pulse" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <section
+      className=""
+    >
       {answers.length === 0 ? (
-        <p className="text-muted-foreground">No answers yet. Be the first to answer!</p>
+        <p
+          className="
+            text-center
+            text-lg font-semibold
+            bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400
+            bg-clip-text text-transparent
+            select-none
+          "
+        >
+          No answers yet. Be the first to answer!
+        </p>
       ) : (
         answers.map((answer) => (
           <AnswerCard
@@ -57,6 +63,6 @@ export const AnswerSection = ({ questionId, questionAuthorId }: AnswerSectionPro
           />
         ))
       )}
-    </div>
+    </section>
   );
 };

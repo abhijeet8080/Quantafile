@@ -3,16 +3,22 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationPrevious,
-  PaginationNext
+  PaginationNext,
 } from "@/components/ui/pagination";
 
 interface PaginationProps {
   page: number;
   setPage: (page: number) => void;
   totalPages: number;
+  className?: string;
 }
 
-export const PaginationControls = ({ page, setPage, totalPages }: PaginationProps) => {
+export const PaginationControls = ({
+  page,
+  setPage,
+  totalPages,
+  className = "",
+}: PaginationProps) => {
   if (totalPages <= 1) return null;
 
   const goToPreviousPage = () => {
@@ -24,17 +30,22 @@ export const PaginationControls = ({ page, setPage, totalPages }: PaginationProp
   };
 
   return (
-    <Pagination className="mt-6 justify-center">
-      <PaginationContent>
+    <Pagination className={`mt-6 flex justify-center items-center gap-4 ${className}`}>
+      <PaginationContent className="flex items-center gap-3">
         <PaginationItem>
           <PaginationPrevious
             onClick={goToPreviousPage}
-            className={page === 1 ? "pointer-events-none opacity-50" : ""}
+            aria-label="Previous page"
+            className={`p-2 rounded-md transition-colors ${
+              page === 1
+                ? "pointer-events-none opacity-40"
+                : "bg-purple-600 text-white hover:bg-purple-500 hover:text-gray-400"
+            }`}
           />
         </PaginationItem>
 
         <PaginationItem>
-          <span className="px-4 py-2 text-sm text-muted-foreground">
+          <span className="px-4 py-2 text-sm font-semibold text-purple-700 dark:text-purple-300 select-none">
             Page {page} of {totalPages}
           </span>
         </PaginationItem>
@@ -42,7 +53,12 @@ export const PaginationControls = ({ page, setPage, totalPages }: PaginationProp
         <PaginationItem>
           <PaginationNext
             onClick={goToNextPage}
-            className={page === totalPages ? "pointer-events-none opacity-50" : ""}
+            aria-label="Next page"
+            className={`p-2 rounded-md transition-colors ${
+              page === totalPages
+                ? "pointer-events-none opacity-40"
+                : "bg-purple-600 text-white hover:bg-purple-500 hover:text-gray-400"
+            }`}
           />
         </PaginationItem>
       </PaginationContent>

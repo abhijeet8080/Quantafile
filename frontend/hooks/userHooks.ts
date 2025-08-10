@@ -1,7 +1,9 @@
 import { getUserDetails } from "@/lib/api/auth";
+import { RootState } from "@/store";
 import { User } from "@/types/user";
 import { ParamValue } from "next/dist/server/request/params";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 export function useGetUserDetails(id: ParamValue) {
   const [user, setUser] = useState<User | null>(null);
@@ -25,4 +27,17 @@ export function useGetUserDetails(id: ParamValue) {
   }, [id]);
 
   return { user, loading,setUser };
+}
+
+export function useRequireAuth() {
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setShowModal(true);
+    }
+  }, [isAuthenticated]);
+
+  return { isAuthenticated, showModal, setShowModal };
 }

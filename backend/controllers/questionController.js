@@ -174,6 +174,7 @@ export const askQuestion = async (req, res) => {
 
 export const getQuestionDetails = async (req, res) => {
   try {
+    console.log("get question details")
     const question = await Question.findById(req.params.id)
       .populate('author', 'username avatar')
       .populate('tags', 'name')
@@ -203,15 +204,15 @@ export const getQuestionDetails = async (req, res) => {
     const userVote = currentUserId
       ? (votes.find(v => v.user.toString() === currentUserId)?.type ?? null)
       : null;
-
+    console.log(question)
     res.json({
       ...question,
       upvoteCount,
       downvoteCount,
-      upvotes,     // array of user id strings (you can omit if too large)
-      downvotes,   // same
+      upvotes,     
+      downvotes,   
       score,
-      userVote,    // 'upvote' | 'downvote' | null
+      userVote,    
     });
   } catch (err) {
     console.error('[getQuestionDetails] failed:', err);

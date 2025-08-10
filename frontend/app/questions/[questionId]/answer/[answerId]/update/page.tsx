@@ -8,8 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { useRequireAuth } from "@/hooks/userHooks";
+import { RequireAuthModal } from "@/components/RequireAuthModal ";
 
 export default function EditAnswerPage() {
+        const { isAuthenticated, showModal } = useRequireAuth();
+  
   const { answerId } = useParams(); // answer ID
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.token);
@@ -55,7 +59,13 @@ export default function EditAnswerPage() {
       setSaving(false);
     }
   };
-
+if (!isAuthenticated) {
+      return (
+        <>
+          <RequireAuthModal open={showModal}  />
+        </>
+      );
+    }
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto py-8">

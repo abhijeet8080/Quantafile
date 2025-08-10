@@ -66,7 +66,6 @@ export const markBestAnswer = async (req, res) => {
     if (answer.question.author.toString() !== req.user.id)
       return res.status(403).json({ message: 'Only question author can mark best answer' });
 
-    // Unmark existing best answer (if any)
     await Answer.updateMany(
       { question: answer.question._id, isBestAnswer: true },
       { isBestAnswer: false }
@@ -107,7 +106,6 @@ export const deleteAnswerAdmin = async (req, res) => {
 
     await answer.deleteOne();
 
-    // Save log
     await Log.create({
       action: 'DELETE_ANSWER',
       targetId: answer._id,
@@ -122,11 +120,16 @@ export const deleteAnswerAdmin = async (req, res) => {
   }
 };
 
-export const  getAnswersForQuestion = async (req, res) => {
+export const getAnswersForQuestion = async (req, res) => {
   try {
     const answers = await Answer.find({ question: req.params.id })
-      .populate('author', 'name avatar')
-      .sort({ createdAt: -1 }); // newest first
+      .populate('author', 'username avatar _id') 
+      .populate({
+        path: 'comments.author',   
+        select: 'username avatar _id',
+      })
+      .sort({ createdAt: -1 });
+
     res.json(answers);
   } catch (err) {
     res.status(500).json({ message: err.message });

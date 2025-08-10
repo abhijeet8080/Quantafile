@@ -21,7 +21,8 @@ import { deleteAnswer, markBestAnswer } from "@/services/answerServices";
 import { useState } from "react";
 import { changeVote } from "@/services/questionServices";
 import { toast } from "sonner";
-import { CommentsModal } from "@/components/Answer/CommentsModal"; // path adjusted as needed
+import { CommentsModal } from "@/components/Answer/CommentsModal";
+import Link from "next/link";
 
 interface AnswerCardProps {
   answer: Answer;
@@ -29,6 +30,7 @@ interface AnswerCardProps {
 }
 
 export const AnswerCard = ({ answer, questionAuthorId }: AnswerCardProps) => {
+  console.log(answer)
   const timeAgo = formatDistanceToNow(new Date(answer.createdAt), {
     addSuffix: true,
   });
@@ -45,6 +47,10 @@ export const AnswerCard = ({ answer, questionAuthorId }: AnswerCardProps) => {
   const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(null);
   const [comments, setComments] = useState(answer.comments);
 
+  // For vote button pulse animation
+  const [pulseUp, setPulseUp] = useState(false);
+  const [pulseDown, setPulseDown] = useState(false);
+
   const handleVote = async (type: "upvote" | "downvote") => {
     if (!token) {
       toast.error("Please login to vote");
@@ -52,6 +58,15 @@ export const AnswerCard = ({ answer, questionAuthorId }: AnswerCardProps) => {
     }
 
     setLoadingVote(true);
+
+    // Trigger pulse animation
+    if (type === "upvote") {
+      setPulseUp(true);
+      setTimeout(() => setPulseUp(false), 300);
+    } else {
+      setPulseDown(true);
+      setTimeout(() => setPulseDown(false), 300);
+    }
 
     try {
       const res = await changeVote("answer", answer._id, type, token);
@@ -112,53 +127,117 @@ export const AnswerCard = ({ answer, questionAuthorId }: AnswerCardProps) => {
   };
 
   return (
-    <div className="border border-border p-4 rounded-lg bg-background space-y-3">
+    <div
+      className="
+        rounded-2xl
+        backdrop-blur-lg bg-white/70 dark:bg-zinc-900/60
+        shadow-lg shadow-purple-500/10
+        p-6 space-y-4
+        transition-all duration-300 ease-in-out
+        hover:scale-[1.02] hover:shadow-xl
+      "
+    >
       {/* Author & Meta */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-4">
         <Image
           src={answer.author.avatar || "/assets/default-avatar.png"}
           alt={answer.author.username || "user avatar"}
-          width={32}
-          height={32}
-          className="rounded-full border"
+          width={40}
+          height={40}
+          className="rounded-full border border-purple-400"
         />
         <div>
-          <p className="font-medium">{answer.author.username}</p>
+          <Link href={`/profile/${answer.author._id}`} className="font-semibold text-zinc-900 dark:text-zinc-100">
+            {answer.author.username}
+          </Link>
           <p className="text-xs text-muted-foreground">{timeAgo}</p>
         </div>
+
         {answer.isBestAnswer && (
-          <Badge variant="default" className="ml-auto bg-green-500 text-white">
+          <Badge
+            variant="default"
+            className="
+              ml-auto
+              bg-gradient-to-r from-green-400 via-green-500 to-green-600
+              text-white
+              shadow-md shadow-green-400/40
+              font-semibold
+              px-3 py-1 rounded-full
+              select-none
+            "
+          >
             Best Answer
           </Badge>
         )}
       </div>
 
       {/* Content */}
-      <div className="prose dark:prose-invert max-w-none">
+      <div
+        className="
+          prose prose-sm dark:prose-invert max-w-none
+          text-zinc-800 dark:text-zinc-200
+          select-text
+        "
+      >
         <p>{answer.content}</p>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-between border-t pt-2">
-        <div className="flex gap-2">
+      <div className="flex items-center justify-between border-t border-purple-300/30 pt-3">
+        <div className="flex gap-3">
+          {/* Upvote */}
           <Button
-            variant={userVote === "upvote" ? "default" : "ghost"}
-            className="flex items-center gap-1"
+            variant="ghost"
             onClick={() => handleVote("upvote")}
             disabled={loadingVote}
+            className={`
+              flex items-center gap-1
+              rounded-full
+              text-purple-600 dark:text-purple-400
+              ${userVote === "upvote" ? "bg-purple-100 dark:bg-purple-900" : ""}
+              transition-all duration-300 ease-in-out
+              hover:scale-[1.1] hover:shadow-lg
+              ${pulseUp ? "animate-pulse" : ""}
+            `}
           >
-            <ThumbsUp size={16} />
-            {upvoteCount}
+            <ThumbsUp size={18} />
+            <span className="font-semibold">{upvoteCount}</span>
           </Button>
+
+          {/* Downvote */}
           <Button
-            variant={userVote === "downvote" ? "default" : "ghost"}
-            className="flex items-center gap-1"
+            variant="ghost"
             onClick={() => handleVote("downvote")}
             disabled={loadingVote}
+            className={`
+              flex items-center gap-1
+              rounded-full
+              text-pink-600 dark:text-pink-400
+              ${userVote === "downvote" ? "bg-pink-100 dark:bg-pink-900" : ""}
+              transition-all duration-300 ease-in-out
+              hover:scale-[1.1] hover:shadow-lg
+              ${pulseDown ? "animate-pulse" : ""}
+            `}
           >
-            <ThumbsDown size={16} />
-            {downvoteCount}
+            <ThumbsDown size={18} />
+            <span className="font-semibold">{downvoteCount}</span>
           </Button>
+
+          {/* Comments */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setCommentsOpen(true)}
+            className="
+              flex items-center gap-1
+              text-zinc-600 dark:text-zinc-400
+              hover:text-purple-600 dark:hover:text-purple-400
+              transition-colors duration-300 ease-in-out
+            "
+          >
+            <MessageCircle size={16} /> {comments.length}
+          </Button>
+
           <CommentsModal
             open={commentsOpen}
             onClose={() => setCommentsOpen(false)}
@@ -169,22 +248,21 @@ export const AnswerCard = ({ answer, questionAuthorId }: AnswerCardProps) => {
               setComments((prev) => [...prev, newComment]);
             }}
           />
-
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setCommentsOpen(true)}
-          >
-            <MessageCircle size={16} /> {comments.length}
-          </Button>
         </div>
 
+        {/* Right action buttons */}
         <div className="flex gap-2">
           {isQuestionAuthor && !answer.isBestAnswer && (
-            <Button variant="secondary" size="sm" onClick={handleMarkBest}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={handleMarkBest}
+              className="flex items-center gap-1 bg-gradient-to-r from-green-400 via-green-500 to-green-600 text-white shadow-lg"
+            >
               <CheckCircle2 size={14} /> Mark Best
             </Button>
           )}
+
           {isAnswerAuthor && (
             <>
               <Button
@@ -195,12 +273,18 @@ export const AnswerCard = ({ answer, questionAuthorId }: AnswerCardProps) => {
                     `/questions/${questionId}/answer/${answer._id}/update`
                   )
                 }
+                className="flex items-center gap-1 border-purple-500 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900"
               >
                 <Edit size={14} /> Edit
               </Button>
+
               <ConfirmDialog
                 trigger={
-                  <Button variant="destructive" size="sm">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="flex items-center gap-1"
+                  >
                     <Trash2 size={14} /> Delete
                   </Button>
                 }

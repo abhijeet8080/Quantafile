@@ -8,7 +8,8 @@ import { QuestionSkeleton } from "@/components/Questions/QuestionSkeleton";
 
 import { onFilterChange } from "@/lib/onFilterChange";
 import { useGetQuestionsWithFilters } from "@/hooks/questionHooks";
-
+import { useRequireAuth } from "@/hooks/userHooks";
+import { RequireAuthModal } from "@/components/RequireAuthModal ";
 export interface FiltersState {
   keyword?: string;
   startDate?: string;
@@ -33,6 +34,7 @@ const sortMap: Record<string, string> = {
 
 export default function ExplorePage() {
   
+  const { isAuthenticated, showModal } = useRequireAuth();
   
   
   const [filters, setFilters] = useState<FiltersState>({
@@ -62,7 +64,13 @@ const queryParams = useMemo(() => {
 
    const { questions, totalPages, loading } = useGetQuestionsWithFilters(queryParams);
   
-
+if (!isAuthenticated) {
+    return (
+      <>
+        <RequireAuthModal open={showModal}  />
+      </>
+    );
+  }
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Explore Questions</h1>
