@@ -26,7 +26,7 @@ export const registerUser = async (req, res) => {
 
     const token = generateToken(user)
 
-    const verificationUrl = `${process.env.BACKEND_URL}/verify-email/${token}`;
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${token}`;
     const htmlBody = `
       <p>Hello ${user.username},</p>
       <p>Please verify your email by clicking the link below:</p>

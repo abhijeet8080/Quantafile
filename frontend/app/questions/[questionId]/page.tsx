@@ -69,7 +69,7 @@ export default function QuestionPage() {
     setLoadingVote(true);
 
     try {
-      const res = await changeVote(questionId, type, token); 
+      const res = await changeVote("question",questionId, type, token); 
 
       const { score, upvoteCount, downvoteCount } = res.data;
       setUpvoteCount(upvoteCount);

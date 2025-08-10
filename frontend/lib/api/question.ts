@@ -21,7 +21,7 @@ export async function deleteQuestionFromId(questionId:ParamValue, token:string|n
 
 export async function handleChangeVote(
   itemType:"question"|"answer",
-  questionId: ParamValue,
+  id: ParamValue,
   type: "upvote" | "downvote",
   token: string | null
 ) {
@@ -29,7 +29,7 @@ export async function handleChangeVote(
     `/votes`,
     {
       itemType: itemType,
-      itemId: questionId,
+      itemId: id,
       type,
     },
     {

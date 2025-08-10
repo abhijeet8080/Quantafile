@@ -8,7 +8,7 @@ import { login } from "@/store/slices/authSlice";
 import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import Link from "next/link";
@@ -22,8 +22,6 @@ export function LoginForm() {
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
-  const searchParams = useSearchParams();
-const redirectUrl = searchParams.get("redirect") || "/";
   useEffect(() => {
     if (isAuthenticated) {
       router.push("/");
@@ -60,7 +58,7 @@ const redirectUrl = searchParams.get("redirect") || "/";
         })
       );
 
-      router.push(redirectUrl);
+      router.push('/');
     } finally {
       setLoading(false);
     }

@@ -35,12 +35,12 @@ export const deleteQuestion = async(questionId:ParamValue, token:string|null)=>{
 
 export const changeVote = async (
   itemType:'question'|'answer',
-  questionId: ParamValue,
+  id: ParamValue,
   type: "upvote" | "downvote",
   token: string | null
 ) => {
   try {
-    const res = await handleChangeVote(itemType, questionId, type, token);
+    const res = await handleChangeVote(itemType, id, type, token);
     return res;
   } catch (error) {
     console.error("Failed to change vote", error);
