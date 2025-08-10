@@ -29,7 +29,7 @@ export default function VerifyEmailPage({
 
         toast.success("Email verified successfully!");
         setStatus("success");
-
+        
         dispatch(
           login({
             user: res.data.user,

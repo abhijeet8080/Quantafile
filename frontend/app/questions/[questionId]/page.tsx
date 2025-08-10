@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { api } from "@/lib/axios";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,46 +15,30 @@ import {
   Trash2,
   CheckCircle2,
 } from "lucide-react";
-import { Question } from "@/types/question";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import Link from "next/link";
 import { AnswerSection } from "@/components/Answer/AnswerSection";
+import { useGetQuestionFromId } from "@/hooks/questionHooks";
+import { changeQuestionStatus, changeVote, deleteQuestion } from "@/services/questionServices";
+import { toast } from "sonner";
 
 export default function QuestionPage() {
   const { questionId } = useParams();
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.token);
-
   const currentUser = useSelector((state: RootState) => state.auth.user);
 
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Vote states
+  const [userVote, setUserVote] = useState<"upvote" | "downvote" | null>(null);
+  const [loadingVote, setLoadingVote] = useState(false);
 
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const res = await api.get(`/questions/${questionId}`);
-        console.log(res.data);
-        setQuestion(res.data);
-      } catch (err) {
-        console.error("Failed to fetch question", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuestion();
-  }, [questionId]);
+  const { question, loading, setQuestion,upvoteCount,downvoteCount, setUpvoteCount, setDownvoteCount } = useGetQuestionFromId(questionId);
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/questions/${questionId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await deleteQuestion(questionId, token);
       router.push("/explore");
     } catch (err) {
       console.error("Failed to delete question", err);
@@ -66,23 +49,63 @@ export default function QuestionPage() {
     newStatus: "open" | "answered" | "closed"
   ) => {
     try {
-      const res = await api.patch(
-        `/questions/${questionId}/status`,
-        {
-          status: newStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log(res.data, "sdf");
+      const res = await changeQuestionStatus(questionId,newStatus,token);
+      
       setQuestion((prev) =>
         prev ? { ...prev, status: res.data.status } : prev
       );
     } catch (err) {
       console.error("Failed to update status", err);
+    }
+  };
+
+  const handleVote = async (type: "upvote" | "downvote") => {
+    if (!token) {
+      toast.error("Please login to vote");
+      return;
+    }
+    if (!question || loadingVote) return;
+
+    setLoadingVote(true);
+
+    try {
+      const res = await changeVote(questionId, type, token); 
+
+      const { score, upvoteCount, downvoteCount } = res.data;
+      setUpvoteCount(upvoteCount);
+      setDownvoteCount(downvoteCount);
+      setQuestion((prev) => (prev ? { ...prev, score } : prev));
+
+      if (type === "upvote") {
+        if (userVote === "upvote") {
+          setUpvoteCount((count) => Math.max(count - 1, 0));
+          setUserVote(null);
+        } else if (userVote === "downvote") {
+          setUpvoteCount((count) => count + 1);
+          setDownvoteCount((count) => Math.max(count - 1, 0));
+          setUserVote("upvote");
+        } else {
+          setUpvoteCount((count) => count + 1);
+          setUserVote("upvote");
+        }
+      } else {
+        if (userVote === "downvote") {
+          setDownvoteCount((count) => Math.max(count - 1, 0));
+          setUserVote(null);
+        } else if (userVote === "upvote") {
+          setDownvoteCount((count) => count + 1);
+          setUpvoteCount((count) => Math.max(count - 1, 0));
+          setUserVote("downvote");
+        } else {
+          setDownvoteCount((count) => count + 1);
+          setUserVote("downvote");
+        }
+      }
+    } catch (err) {
+      console.error("Failed to vote", err);
+      toast.error("Failed to record your vote. Please try again.");
+    } finally {
+      setLoadingVote(false);
     }
   };
 
@@ -208,13 +231,23 @@ export default function QuestionPage() {
 
       {/* Votes & Answers Count */}
       <div className="flex items-center gap-4 pt-4 border-t">
-        <Button variant="ghost" className="flex items-center gap-1">
+        <Button
+          variant={userVote === "upvote" ? "default" : "ghost"}
+          className="flex items-center gap-1"
+          onClick={() => handleVote("upvote")}
+          disabled={loadingVote}
+        >
           <ThumbsUp size={16} />
-          {question.upvoteCount}
+          {upvoteCount}
         </Button>
-        <Button variant="ghost" className="flex items-center gap-1">
+        <Button
+          variant={userVote === "downvote" ? "default" : "ghost"}
+          className="flex items-center gap-1"
+          onClick={() => handleVote("downvote")}
+          disabled={loadingVote}
+        >
           <ThumbsDown size={16} />
-          {question.downvoteCount}
+          {downvoteCount}
         </Button>
         <div className="flex items-center gap-1 text-sm text-muted-foreground">
           <MessageCircle size={16} />

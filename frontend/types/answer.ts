@@ -10,7 +10,7 @@ export interface Answer {
   score: number;
   isBestAnswer: boolean;
   comments: {
-    author: { _id: string; username: string };
+    author: { _id: string; username: string, avatar:string };
     content: string;
     createdAt: string;
   }[];

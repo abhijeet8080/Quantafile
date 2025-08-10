@@ -1,39 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useParams } from "next/navigation";
-import { api } from "@/lib/axios";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import EditProfileModal from "@/components/User/EditProfileModal";
 import { User } from "@/types/user";
 import UserQuestions from "@/components/User/UserQuestions";
 import SkeletonLoader from "@/components/User/SkeletonLoader ";
+import LoginPromptModal from "@/components/LoginPromptModal";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { useGetUserDetails } from "@/hooks/userHooks";
 
 export default function ProfilePage() {
   const { id } = useParams();
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
   const [openEdit, setOpenEdit] = useState(false);
-
+  const isAuthenticated = useSelector((state:RootState)=>state.auth.isAuthenticated)
   const handleProfileUpdate = (updatedUser: User) => {
     setUser(updatedUser);
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await api.get(`/users/${id}`);
-        console.log(res.data)
-        setUser(res.data);
-      } catch (err) {
-        console.error("Failed to fetch user", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUser();
-  }, [id]);
+  const {user,loading,setUser } = useGetUserDetails(id);
 
   if (loading) {
     return <SkeletonLoader />;
@@ -47,6 +35,7 @@ export default function ProfilePage() {
 
   return (
     <div className="w-full  py-12 px-4 space-y-6 bg-background">
+      <LoginPromptModal isOpen={!isAuthenticated}/>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-4 border rounded-lg bg-card shadow-sm">
         <div className="flex items-center gap-6">
           <Image

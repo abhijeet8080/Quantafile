@@ -59,6 +59,7 @@ export const deleteAnswer = async (req, res) => {
 
 export const markBestAnswer = async (req, res) => {
   try {
+    console.log("mark best answer called")
     const answer = await Answer.findById(req.params.id).populate('question');
     if (!answer) return res.status(404).json({ message: 'Answer not found' });
 
@@ -83,6 +84,7 @@ export const markBestAnswer = async (req, res) => {
 
 export const addCommentToAnswer = async (req, res) => {
   try {
+    console.log('add answer called')
     const answer = await Answer.findById(req.params.id);
     if (!answer) return res.status(404).json({ message: 'Answer not found' });
 

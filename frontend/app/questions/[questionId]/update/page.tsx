@@ -1,48 +1,34 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { api } from "@/lib/axios";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { Question } from "@/types/question";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-
+import { useQuestionDetails } from "@/hooks/questionHooks";
+import { updateQuestion } from "@/lib/api/question";
 
 export default function UpdateQuestionPage() {
   const { questionId } = useParams();
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.token);
 
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [tags, setTags] = useState("");
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const res = await api.get(`/questions/${questionId}`);
-        const q = res.data;
-        setQuestion(q);
-        setTitle(q.title);
-        setDescription(q.description);
-        setTags(q.tags.map((t: { _id: string; name: string }) => t.name).join(", "));
-
-      } catch (err) {
-        toast.error("Failed to fetch question.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchQuestion();
-  }, [questionId]);
+  const {
+    question,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    tags,
+    setTags,
+    loading,
+  } = useQuestionDetails(questionId);
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,21 +38,15 @@ export default function UpdateQuestionPage() {
     }
     setSubmitting(true);
     try {
-      await api.put(
-        `/questions/${questionId}`,
-        {
-          title,
-          description,
-          tags: tags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      updateQuestion(
+        questionId,
+        title,
+        description,
+        tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+        token
       );
       toast.success("Question updated successfully.");
       router.push(`/questions/${questionId}`);

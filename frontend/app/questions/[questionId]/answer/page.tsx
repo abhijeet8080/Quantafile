@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { api } from "@/lib/axios";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { Question } from "@/types/question";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { createAnswer } from "@/services/answerServices";
+import { useGetQuestionFromId } from "@/hooks/questionHooks";
+import { toast } from "sonner";
 
 export default function AnswerPage() {
   const { questionId } = useParams();
@@ -16,39 +17,16 @@ export default function AnswerPage() {
 
   const token = useSelector((state: RootState) => state.auth.token);
 
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [loading, setLoading] = useState(true);
   const [content, setContent] = useState("");
   const [submitting, setSubmitting] = useState(false);
-
-  useEffect(() => {
-    const fetchQuestion = async () => {
-      try {
-        const res = await api.get(`/questions/${questionId}`);
-        setQuestion(res.data);
-      } catch (err) {
-        console.error("Failed to fetch question", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuestion();
-  }, [questionId]);
+  const {question,loading}=useGetQuestionFromId(questionId)
+  
 
   const handleSubmit = async () => {
-    if (!content.trim()) return alert("Answer cannot be empty!");
+    if (!content.trim()) return toast.warning("Answer cannot be empty!");
     setSubmitting(true);
     try {
-      await api.post(
-        `/answers`,
-        { questionId:questionId,content },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      createAnswer(questionId,content,token)
       router.push(`/questions/${questionId}`);
     } catch (err) {
       console.error("Failed to post answer", err);

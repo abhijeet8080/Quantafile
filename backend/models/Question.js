@@ -39,7 +39,8 @@ const questionSchema = new mongoose.Schema({
   downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
-questionSchema.index({ title: 'text', content: 'text', tags: 'text' });
+questionSchema.index({ title: 'text', description: 'text', tags: 'text' });
+
 
 const Question = mongoose.model('Question', questionSchema);
 export default Question

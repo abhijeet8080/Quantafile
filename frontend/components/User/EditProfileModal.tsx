@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useState } from "react";
 import uploadAvatar from "@/lib/upload-avatar";
-import { api } from "@/lib/axios";
 import { User } from "@/types/user";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { updateUser } from "@/lib/api/auth";
 
 interface Props {
   user: User;
@@ -48,17 +48,9 @@ export default function EditProfileModal({ user, setOpen,onProfileUpdated }: Pro
     }
 
     try {
-      const res = await api.put(
-        `/users/profile`,
-        { username: name, avatar: avatarUrl },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await updateUser({ name, avatarUrl, token });
 
-      // ✅ directly use response data
+
       onProfileUpdated?.(res.data);
 
       toast.success("Profile updated!");

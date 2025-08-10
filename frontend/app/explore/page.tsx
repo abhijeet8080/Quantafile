@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import {  useMemo, useState } from "react";
 import { QuestionCard } from "@/components/Questions/QuestionCard";
 import { Filters } from "@/components/Questions/Filters";
 import { PaginationControls } from "@/components/Questions/Pagination";
 import { QuestionSkeleton } from "@/components/Questions/QuestionSkeleton";
-import { api } from "@/lib/axios";
 
-import { Question } from "@/types/question";
 import { onFilterChange } from "@/lib/onFilterChange";
+import { useGetQuestionsWithFilters } from "@/hooks/questionHooks";
 
 export interface FiltersState {
   keyword?: string;
@@ -33,10 +32,8 @@ const sortMap: Record<string, string> = {
 
 
 export default function ExplorePage() {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
+  
+  
   
   const [filters, setFilters] = useState<FiltersState>({
     keyword: "",
@@ -49,40 +46,22 @@ export default function ExplorePage() {
     sortBy: "newest",
     page: 1,
   });
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setLoading(true);
-      try {
-        const queryParams = new URLSearchParams();
-        queryParams.set("page", (filters.page ?? 1).toString());
+const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    params.set("page", (filters.page ?? 1).toString());
+    if (filters.keyword) params.set("keyword", filters.keyword);
+    if (filters.sortBy) params.set("sortBy", sortMap[filters.sortBy] || "newest");
+    if (filters.status) params.set("status", filters.status);
+    if (filters.minVotes) params.set("minVotes", filters.minVotes.toString());
+    if (filters.maxVotes) params.set("maxVotes", filters.maxVotes.toString());
+    if (filters.userId) params.set("user", filters.userId);
+    if (filters.startDate) params.set("startDate", filters.startDate);
+    if (filters.endDate) params.set("endDate", filters.endDate);
+    return params;
+  }, [filters]);
 
-        if (filters.keyword) queryParams.set("keyword", filters.keyword);
-        if (filters.sortBy) {
-          queryParams.set("sortBy", sortMap[filters.sortBy] || "newest");
-        }
-        if (filters.status) queryParams.set("status", filters.status);
-
-        if (filters.minVotes)
-          queryParams.set("minVotes", filters.minVotes.toString());
-        if (filters.maxVotes)
-          queryParams.set("maxVotes", filters.maxVotes.toString());
-        if (filters.userId) queryParams.set("user", filters.userId);
-        if (filters.startDate) queryParams.set("startDate", filters.startDate);
-        if (filters.endDate) queryParams.set("endDate", filters.endDate);
-
-        const res = await api.get(`/questions?${queryParams.toString()}`);
-        console.log(res.data.questions.tags);
-        setQuestions(res.data.questions);
-        setTotalPages(res.data.totalPages);
-      } catch (error) {
-        console.error("Failed to fetch questions:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuestions();
-  }, [filters, page]);
+   const { questions, totalPages, loading } = useGetQuestionsWithFilters(queryParams);
+  
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8">

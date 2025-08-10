@@ -17,7 +17,6 @@ export default function Navbar() {
   const { isAuthenticated, user } = useSelector(
     (state: RootState) => state.auth
   );
-  console.log("User from navbar", user)
   const handleLogout = () => {
     dispatch(logout());
   };

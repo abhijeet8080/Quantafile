@@ -1,46 +1,27 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/axios';
-import { Skeleton } from '../ui/skeleton';
-import { PaginationControls } from '../Questions/Pagination';
-import { QuestionCard } from '../Questions/QuestionCard';
-import { Question } from '@/types/question';
-import Link from 'next/link';
-import { Button } from '../ui/button';
+import { useMemo, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { PaginationControls } from "../Questions/Pagination";
+import { QuestionCard } from "../Questions/QuestionCard";
+import Link from "next/link";
+import { Button } from "../ui/button";
+import { useGetQuestionsWithFilters } from "@/hooks/questionHooks";
 
 const QUESTIONS_PER_PAGE = 5;
 
 export default function UserQuestions({ userId }: { userId: string }) {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [totalQuestions, setTotalQuestions] = useState(0);
 
-  const totalPages = Math.ceil(totalQuestions / QUESTIONS_PER_PAGE);
-
-  useEffect(() => {
-    const fetchQuestions = async () => {
-      setLoading(true);
-      try {
-        const res = await api.get(`/questions`, {
-          params: {
-            user: userId,
-            page,
-            limit: QUESTIONS_PER_PAGE,
-          },
-        });
-        setQuestions(res.data.questions || []);
-        setTotalQuestions(res.data.total || 0);
-      } catch (err) {
-        console.error('Failed to fetch user questions', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchQuestions();
+  const queryParams = useMemo(() => {
+    const params = new URLSearchParams();
+    if (userId) params.set("user", userId);
+    params.set("page", page.toString());
+    params.set("limit", QUESTIONS_PER_PAGE.toString());
+    return params;
   }, [userId, page]);
+
+  const { questions, totalPages, loading } = useGetQuestionsWithFilters(queryParams);
 
   if (loading) {
     return (
@@ -57,7 +38,9 @@ export default function UserQuestions({ userId }: { userId: string }) {
       <div className="mt-12 flex flex-col items-center justify-center gap-4 text-center text-muted-foreground">
         <div className="text-4xl">🤔</div>
         <p className="text-lg font-medium">No questions asked yet</p>
-        <p className="text-sm">It looks like you haven’t asked any questions. Start a new discussion!</p>
+        <p className="text-sm">
+          It looks like you haven’t asked any questions. Start a new discussion!
+        </p>
         <Link href="/ask">
           <Button variant="default">Ask Your First Question</Button>
         </Link>
@@ -70,7 +53,9 @@ export default function UserQuestions({ userId }: { userId: string }) {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Questions Asked</h3>
         <Link href="/ask">
-          <Button size="sm" variant="outline">Ask a Question</Button>
+          <Button size="sm" variant="outline">
+            Ask a Question
+          </Button>
         </Link>
       </div>
 
@@ -81,7 +66,11 @@ export default function UserQuestions({ userId }: { userId: string }) {
       </div>
 
       <div className="pt-4">
-        <PaginationControls page={page} setPage={setPage} totalPages={totalPages} />
+        <PaginationControls
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages}
+        />
       </div>
     </div>
   );

@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Edit, Trash2, CheckCircle2, MessageCircle } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { api } from "@/lib/axios";
 import { useRouter } from "next/navigation";
 import { ConfirmDialog } from "../ConfirmDialog";
+import { changeQuestionStatus, deleteQuestion } from "@/services/questionServices";
 
 interface QuestionCardProps {
   question: Question;
@@ -28,11 +28,7 @@ export const QuestionCard = ({ question }: QuestionCardProps) => {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/questions/${question._id}`,{
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      await deleteQuestion(question._id,token)
       window.location.reload();
     } catch (err) {
       console.error("Delete failed", err);
@@ -48,9 +44,7 @@ export const QuestionCard = ({ question }: QuestionCardProps) => {
           : question.status === "answered"
           ? "closed"
           : "open";
-      await api.patch(`/questions/${question._id}/status`, {
-        status: newStatus,
-      });
+      await changeQuestionStatus(question._id,newStatus,token)
       window.location.reload();
     } catch (err) {
       console.error("Status change failed", err);
@@ -129,7 +123,7 @@ export const QuestionCard = ({ question }: QuestionCardProps) => {
             size="sm"
             onClick={(e) => {
               e.preventDefault();
-              router.push(`/questions/edit/${question._id}`);
+              router.push(`/questions/${question._id}/update`);
             }}
           >
             <Edit size={14} />
@@ -167,7 +161,7 @@ export const QuestionCard = ({ question }: QuestionCardProps) => {
               if (!currentUser) {
                 router.push("/login");
               } else {
-                router.push(`/questions/${question._id}#answer-form`);
+                router.push(`/questions/${question._id}/answer`);
               }
             }}
           >

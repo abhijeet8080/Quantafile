@@ -4,6 +4,7 @@ import Tag from '../models/Tag.js';
 import Log from "../models/Log.js"
 import Answer from '../models/Answer.js'
 import mongoose from 'mongoose';
+import Vote from "../models/Vote.js";
 
 
 export const getAllQuestions = async (req, res) => {
@@ -169,20 +170,56 @@ export const askQuestion = async (req, res) => {
   }
 };
 
-// Get single question with details
+
+
 export const getQuestionDetails = async (req, res) => {
   try {
     const question = await Question.findById(req.params.id)
       .populate('author', 'username avatar')
-      .populate('tags', 'name');
+      .populate('tags', 'name')
+      .lean();
 
     if (!question) return res.status(404).json({ message: 'Question not found' });
 
-    res.json(question);
+    // Fetch votes for this question from the Vote collection
+    const votes = await Vote.find({ itemType: 'question', itemId: question._id })
+      .select('user type -_id')
+      .lean();
+
+    // Build arrays of userIds for each vote type
+    const upvotes = votes.filter(v => v.type === 'upvote').map(v => v.user.toString());
+    const downvotes = votes.filter(v => v.type === 'downvote').map(v => v.user.toString());
+
+    const upvoteCount = upvotes.length;
+    const downvoteCount = downvotes.length;
+    const score = upvoteCount - downvoteCount;
+
+    // Optionally: persist computed score to question (keeps DB consistent)
+    // await Question.findByIdAndUpdate(question._id, { score }).catch(() => {});
+
+    // If the request has a logged-in user, compute their vote type
+    const currentUserId =
+      req.user && (req.user._id?.toString?.() || req.user.id?.toString?.());
+    const userVote = currentUserId
+      ? (votes.find(v => v.user.toString() === currentUserId)?.type ?? null)
+      : null;
+
+    res.json({
+      ...question,
+      upvoteCount,
+      downvoteCount,
+      upvotes,     // array of user id strings (you can omit if too large)
+      downvotes,   // same
+      score,
+      userVote,    // 'upvote' | 'downvote' | null
+    });
   } catch (err) {
+    console.error('[getQuestionDetails] failed:', err);
     res.status(500).json({ message: err.message });
   }
 };
+
+
 
 // Edit question
 export const updateQuestion = async (req, res) => {
@@ -353,3 +390,6 @@ export const deleteQuestionAdmin = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+
+

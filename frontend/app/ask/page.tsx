@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/axios";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { Textarea } from "@/components/ui/textarea";
+import LoginPromptModal from "@/components/LoginPromptModal";
+import { createQuestion } from "@/lib/api/question";
 
 export default function AskQuestionPage() {
   const [title, setTitle] = useState("");
@@ -18,24 +19,18 @@ export default function AskQuestionPage() {
   const [tags, setTags] = useState("");
   const router = useRouter();
   const token = useSelector((state: RootState) => state.auth.token);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+const [showLoginPrompt, setShowLoginPrompt] = useState(false);
 
+useEffect(() => {
+  setShowLoginPrompt(!isAuthenticated);
+}, [isAuthenticated]);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const res = await api.post(
-        "/questions",
-        {
-          title,
-          description,
-          tags: tags.split(",").map((tag) => tag.trim()),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await createQuestion(title, description, tags.split(",").map((tag) => tag.trim()), token); 
+
       console.log(res.data);
       toast.success("Question posted successfully!");
       router.push("/explore");
@@ -109,6 +104,10 @@ export default function AskQuestionPage() {
           </form>
         </CardContent>
       </Card>
+       <LoginPromptModal
+        isOpen={showLoginPrompt}
+      />
     </div>
+    
   );
 }
