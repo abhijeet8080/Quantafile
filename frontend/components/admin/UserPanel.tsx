@@ -23,6 +23,7 @@ import {
 } from "../ui/table";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import Link from "next/link";
 
 export function UsersPanel() {
   const [users, setUsers] = useState<UserType[]>([]);
@@ -60,7 +61,7 @@ export function UsersPanel() {
 
   useEffect(() => {
     fetchUsers();
-  });
+  }, []);
 
   const toggleBan = async (u: UserType) => {
     try {
@@ -192,8 +193,8 @@ export function UsersPanel() {
                   even:bg-white/50 odd:bg-white/30 dark:even:bg-zinc-900/40 dark:odd:bg-zinc-900/30
                 "
               >
-                <TableCell>{u.username}</TableCell>
-                <TableCell>{u.email}</TableCell>
+                <TableCell><Link href={`/profile/${u._id}`}>{u.username}</Link></TableCell>
+                <TableCell><Link href={`/profile/${u._id}`}>{u.email}</Link></TableCell>
                 <TableCell>
                   <Select
                     value={u.role}

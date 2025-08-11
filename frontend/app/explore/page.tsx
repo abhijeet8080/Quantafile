@@ -72,7 +72,7 @@ if (!isAuthenticated) {
     );
   }
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8">
+    <main className="max-w-4xl pt-28 mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4">Explore Questions</h1>
       <Filters
         filters={filters}

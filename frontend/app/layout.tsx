@@ -7,6 +7,7 @@ import AppInitializer from '@/components/AppInitializer';
 import { Toaster } from "sonner";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import AuthSyncClient from "./AuthSyncClient";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -39,6 +40,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <ClientProvider>
+              <AuthSyncClient />
               <AppInitializer />
               <Toaster richColors position="top-center" /> 
               <Navbar />

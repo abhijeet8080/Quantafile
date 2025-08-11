@@ -35,7 +35,7 @@ export function TagsPanel() {
 
   useEffect(() => {
     fetchTags();
-  });
+  }, []);
 
   const createTag = async () => {
     if (!name.trim()) return alert('Name required');

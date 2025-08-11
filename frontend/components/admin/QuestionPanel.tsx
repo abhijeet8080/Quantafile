@@ -69,7 +69,7 @@ export function QuestionsPanel() {
 
   useEffect(() => {
     fetchQuestions();
-  });
+  }, []);
 
   const handleDelete = async (id: string) => {
     try {
@@ -100,8 +100,8 @@ export function QuestionsPanel() {
         p-6 rounded-2xl
         backdrop-blur-lg bg-white/70 dark:bg-zinc-900/60
         shadow-lg shadow-purple-500/20
-      
-         hover:shadow-xl
+        transition-all duration-300 ease-in-out
+        hover:scale-[1.01] hover:shadow-xl
       "
     >
       {/* Filters */}

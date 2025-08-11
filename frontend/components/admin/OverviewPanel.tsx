@@ -9,6 +9,7 @@ import { RootState } from "@/store";
 interface TagUsage {
   _id: string;
   count: number;
+  name:string
 }
 
 interface AnalyticsData {
@@ -86,8 +87,8 @@ export function OverviewPanel() {
           </div>
 
           {stats?.mostUsedTags?.length ? (
-  <ul className="flex flex-wrap gap-3 max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-transparent">
-    {stats.mostUsedTags.map(({ _id, count }) => (
+  <ul className="flex flex-wrap gap-3 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-purple-400 scrollbar-track-transparent">
+    {stats.mostUsedTags.map(({ _id, count,name }) => (
       <li
         key={_id}
         className="
@@ -111,7 +112,7 @@ export function OverviewPanel() {
             tracking-wide
           "
         >
-          {_id}
+          {name}
         </span>
         <span
           className="

@@ -7,4 +7,5 @@ export interface User {
   isVerified: boolean;
   role: string;
   isBanned: boolean;
+  
 }

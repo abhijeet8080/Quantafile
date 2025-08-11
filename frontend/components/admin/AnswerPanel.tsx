@@ -53,7 +53,7 @@ export function AnswersPanel() {
 
   useEffect(() => {
     fetchAnswers();
-  }, );
+  }, []);
 
   const deleteAnswer = async (id: string) => {
     try {

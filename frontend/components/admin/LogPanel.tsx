@@ -37,7 +37,7 @@ export const LogPanel = () => {
       .then((res) => setLogs(res.data))
       .catch((err) => console.error("Failed to fetch logs:", err))
       .finally(() => setLoading(false));
-  });
+  }, [token]);
 
   if (loading) {
     return (

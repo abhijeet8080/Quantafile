@@ -9,6 +9,7 @@ import { RootState } from "@/store";
 interface TagUsage {
   _id: string;
   count: number;
+  name:string
 }
 
 interface AnalyticsData {
@@ -89,7 +90,7 @@ export function AnalyticsPanel() {
               text-lg font-medium
             "
           >
-            {data.mostUsedTags.map(({ _id, count }) => (
+            {data.mostUsedTags.map(({ _id, count,name }) => (
               <li
                 key={_id}
                 className="
@@ -99,7 +100,7 @@ export function AnalyticsPanel() {
                   cursor-default select-none
                 "
               >
-                {`${_id} — ${count}`}
+                {`${name} — ${count}`}
               </li>
             ))}
           </ul>

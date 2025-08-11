@@ -14,7 +14,7 @@ import { isAuthenticated,authorizeRoles } from '../middleware/authMiddleware.js'
 // ===================== USER ROUTES =====================
 
 // Get logged-in user profile
-router.get('/:id', getUserDetails);
+router.get('/me',isAuthenticated, getUserDetails);
 
 
 router.get('/profile', isAuthenticated, getUserProfile);

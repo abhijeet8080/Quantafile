@@ -313,11 +313,31 @@ export const getAnalytics = async (req, res) => {
     const totalAnswers = await Answer.countDocuments();
     const activeUsers = await User.countDocuments({ isBanned: false });
     const tagsUsage = await Question.aggregate([
-      { $unwind: '$tags' },
-      { $group: { _id: '$tags', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 10 }
-    ]); 
+  { $unwind: '$tags' },
+  { $group: { _id: '$tags', count: { $sum: 1 } } },
+  { $sort: { count: -1 } },
+  { $limit: 10 },
+
+  {
+    $lookup: {
+      from: 'tags',            
+      localField: '_id',
+      foreignField: '_id',
+      as: 'tagInfo'
+    }
+  },
+
+  { $unwind: '$tagInfo' },
+
+  {
+    $project: {
+      _id: 1,                 
+      name: '$tagInfo.name',
+      count: 1
+    }
+  }
+]);
+
     console.log(tagsUsage)
 
     res.json({

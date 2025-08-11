@@ -240,7 +240,7 @@ if (!isAuthenticated) {
   {/* Author + Meta */}
   <div className="flex items-center gap-4 text-sm text-muted-foreground">
     <Image
-      src={question.author.avatar || "/default-avatar.png"}
+      src={question.author.avatar || "/assets/default-avatar.png"}
       alt="Author Avatar"
       width={36}
       height={36}

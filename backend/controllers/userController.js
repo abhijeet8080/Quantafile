@@ -2,8 +2,8 @@ import User  from '../models/User.js';
 
 export const getUserDetails = async (req, res) => {
   try {
-    const { id } = req.params;
-
+    console.log("get user details called")
+    const {id} = req.user
     if (!id || id.length !== 24) {
       return res.status(400).json({ message: 'Invalid user ID' });
     }
