@@ -1,4 +1,4 @@
-import { getUserDetails } from "@/lib/api/auth";
+import { getUserDetails } from "@/services/userServices";
 import { RootState } from "@/store";
 import { User } from "@/types/user";
 import { ParamValue } from "next/dist/server/request/params";

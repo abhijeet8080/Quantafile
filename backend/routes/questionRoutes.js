@@ -9,7 +9,6 @@ import {
   markQuestionStatus,
   searchQuestions,
   getAllQuestions,
-  deleteQuestionAdmin,
 } from '../controllers/questionController.js';
 
 import { authorizeRoles, isAuthenticated } from '../middleware/authMiddleware.js';
@@ -25,7 +24,6 @@ router.get('/:id', getQuestionDetails);
 router.put('/:id', isAuthenticated, updateQuestion);
 
 router.delete('/:id', isAuthenticated, deleteQuestion);
-router.delete('/:id', isAuthenticated, authorizeRoles('admin'), deleteQuestionAdmin);
 
 router.patch('/:id/status', isAuthenticated, markQuestionStatus);
 router.get('/:id/answers',isAuthenticated,getAnswersForQuestion)

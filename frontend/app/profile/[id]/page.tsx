@@ -8,7 +8,6 @@ import EditProfileModal from "@/components/User/EditProfileModal";
 import { User } from "@/types/user";
 import UserQuestions from "@/components/User/UserQuestions";
 import SkeletonLoader from "@/components/User/SkeletonLoader ";
-import LoginPromptModal from "@/components/LoginPromptModal";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useGetUserDetails, useRequireAuth } from "@/hooks/userHooks";
@@ -44,7 +43,6 @@ export default function ProfilePage() {
   
   return (
     <div className="w-full min-h-screen py-16 px-6 space-y-8 bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-purple-900 dark:via-pink-900 dark:to-orange-900 rounded-lg shadow-lg">
-      <LoginPromptModal isOpen={!isAuthenticated} />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 p-6 bg-card rounded-xl shadow-md border border-border transition-shadow hover:shadow-lg">
         <div className="flex items-center gap-6">

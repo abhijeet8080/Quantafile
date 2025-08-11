@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { useQuestionDetails } from "@/hooks/questionHooks";
-import { updateQuestion } from "@/lib/api/question";
+import { updateQuestion } from "@/services/questionServices";
 import { useRequireAuth } from "@/hooks/userHooks";
 import { RequireAuthModal } from "@/components/RequireAuthModal ";
 

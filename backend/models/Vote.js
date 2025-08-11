@@ -26,5 +26,4 @@ const voteSchema = new mongoose.Schema({
   }
 }, { timestamps: true });
 
-const Vote = mongoose.model('Vote', voteSchema);
-export default Vote;
+export default mongoose.models.Vote || mongoose.model('Vote', voteSchema);

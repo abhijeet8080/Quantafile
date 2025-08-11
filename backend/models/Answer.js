@@ -38,5 +38,5 @@ score: {
   downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 }, { timestamps: true });
 
-const Answer = mongoose.model('Answer', answerSchema);
-export default Answer
+
+export default mongoose.models.Answer || mongoose.model('Answer', answerSchema);

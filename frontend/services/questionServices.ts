@@ -1,18 +1,52 @@
 // services/questionServices.ts
-import {  deleteQuestionFromId,changeQuestionStatus2, getLatestQuestions, handleChangeVote, fetchQuestionsFilters } from "@/lib/api/question";
 import { api } from "@/lib/axios";
 import { ParamValue } from "next/dist/server/request/params";
 
 export const fetchQuestions = async (numberOfQuestions: number) => {
   try {
-    const res = await getLatestQuestions(numberOfQuestions);
+    const res = await api.get("/questions/", {
+    params: {
+      limit: numberOfQuestions,
+    },
+  });
     return res.data.questions;
   } catch (err) {
     console.error("Failed to fetch questions", err);
     return []; 
   }
 };
+export async function createQuestion(title:string,description:string,tags: string[],token:string|null){
+  return await api.post(
+        "/questions",
+        {
+          title,
+          description,
+          tags
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+}
 
+
+export async function updateQuestion(questionId:ParamValue,title:string, description:string,tags:string[], token:string|null){
+  return await api.put(
+        `/questions/${questionId}`,
+        {
+          title,
+          description,
+          tags,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+}
 export const fetchQuestionDetails= async(questionId:ParamValue)=>{
   try {
     const res = await await api.get(`/questions/${questionId}`);  
@@ -26,7 +60,11 @@ export const fetchQuestionDetails= async(questionId:ParamValue)=>{
 
 export const deleteQuestion = async(questionId:ParamValue, token:string|null)=>{
   try {
-    return await deleteQuestionFromId(questionId,token)
+    return await await api.delete(`/questions/${questionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
   } catch (error) {
     console.error("Failed to delete question", error);
     throw error
@@ -40,7 +78,19 @@ export const changeVote = async (
   token: string | null
 ) => {
   try {
-    const res = await handleChangeVote(itemType, id, type, token);
+    const res = await await api.post(
+    `/votes`,
+    {
+      itemType: itemType,
+      itemId: id,
+      type,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
     return res;
   } catch (error) {
     console.error("Failed to change vote", error);
@@ -54,7 +104,17 @@ export const changeQuestionStatus = async (
   token: string | null
 ) => {
   try {
-    const res = await changeQuestionStatus2(questionId, newStatus, token);
+    const res = await await api.patch(
+        `/questions/${questionId}/status`,
+        {
+          status: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     return res;
   } catch (error) {
     console.error("Failed to change vote", error);
@@ -64,7 +124,7 @@ export const changeQuestionStatus = async (
 
 export const fetchQuestionsWithFilters = async (queryParams: URLSearchParams) => {
   try {
-    const res = await fetchQuestionsFilters(queryParams);
+    const res = await  api.get(`/questions?${queryParams.toString()}`);
     return {
       questions: res.data.questions,
       totalPages: res.data.totalPages,
@@ -75,3 +135,21 @@ export const fetchQuestionsWithFilters = async (queryParams: URLSearchParams) =>
   }
 };
 
+export const deleteQuestionAdmin = async (
+  questionId: ParamValue,
+  reason: string,
+  token: string | null
+) => {
+  try {
+    const res = await api.delete(`/questions/${questionId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: { reason }, 
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Failed to delete question as admin", error);
+    throw error;
+  }
+};

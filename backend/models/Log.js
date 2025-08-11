@@ -4,7 +4,14 @@ const logSchema = new mongoose.Schema(
   {
     action: {
       type: String,
-      enum: ['DELETE_QUESTION', 'DELETE_ANSWER'],
+      enum: [
+        'DELETE_QUESTION',
+        'DELETE_ANSWER',
+        'BAN_USER',
+        'UNBAN_USER',
+        'CHANGE_ROLE',
+        'TOGGLE_QUESTION_STATUS'
+      ],
       required: true,
     },
     targetId: {
@@ -14,7 +21,7 @@ const logSchema = new mongoose.Schema(
     },
     targetModel: {
       type: String,
-      enum: ['Question', 'Answer'],
+      enum: ['Question', 'Answer', 'User'],
       required: true,
     },
     reason: {
@@ -34,4 +41,6 @@ const logSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model('Log', logSchema);
+const Log = mongoose.models.Log || mongoose.model('Log', logSchema);
+
+export default Log

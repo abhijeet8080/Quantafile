@@ -4,7 +4,6 @@ export const getUserDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate ObjectId format (optional but good practice)
     if (!id || id.length !== 24) {
       return res.status(400).json({ message: 'Invalid user ID' });
     }

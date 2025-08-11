@@ -113,9 +113,9 @@ export const QuestionCard = ({ question, className = "" }: QuestionCardProps) =>
           ) : (
             <div className="w-6 h-6 rounded-full bg-gray-300 dark:bg-gray-700" />
           )}
-          <span className="truncate max-w-[110px] font-semibold text-purple-700 dark:text-purple-400">
+          <Link href={`/profile/${question.author._id}`} className="truncate max-w-[110px] font-semibold text-purple-700 dark:text-purple-400">
             @{question.author._id.slice(0, 6)}
-          </span>
+          </Link>
           <span className="opacity-75">• {timeAgo}</span>
         </div>
         <div className="flex items-center gap-5 text-purple-700 dark:text-purple-400 font-semibold">

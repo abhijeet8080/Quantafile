@@ -41,6 +41,4 @@ const questionSchema = new mongoose.Schema({
 
 questionSchema.index({ title: 'text', description: 'text', tags: 'text' });
 
-
-const Question = mongoose.model('Question', questionSchema);
-export default Question
+export default mongoose.models.Question || mongoose.model('Question', questionSchema);

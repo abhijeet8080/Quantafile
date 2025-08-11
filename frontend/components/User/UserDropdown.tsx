@@ -30,6 +30,11 @@ export default function UserDropdown({ user, handleLogout }: { user: User|null; 
         {/* <DropdownMenuItem asChild>
           <Link href="/settings">Settings</Link>
         </DropdownMenuItem> */}
+        {user?.role === "admin" && (
+          <DropdownMenuItem asChild>
+            <Link href="/admin-dashboard">Admin Dashboard</Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={handleLogout} className="text-red-500">
           Logout
         </DropdownMenuItem>

@@ -99,7 +99,7 @@ export function CommentsModal({
       >
         <Image
           src={c.author.avatar || "/assets/default-avatar.png"}
-          alt={c.author.username}
+          alt={c.author.username||'user"s profile'}
           width={32}
           height={32}
           className="rounded-full border border-purple-400 dark:border-purple-600 shrink-0"

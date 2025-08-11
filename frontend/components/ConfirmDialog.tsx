@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface ConfirmDialogProps {
-  trigger: ReactNode; // Button or icon that opens the dialog
+  trigger: ReactNode;
   title?: string;
   description?: string;
   confirmText?: string;
@@ -33,14 +33,45 @@ export function ConfirmDialog({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent
+        className="
+          rounded-2xl 
+          backdrop-blur-lg bg-white/70 dark:bg-zinc-900/60
+          shadow-lg shadow-purple-500/10
+          transition-all duration-300 ease-in-out
+          animate-in fade-in-50 slide-in-from-top-4
+        "
+      >
         <AlertDialogHeader>
-          <AlertDialogTitle>{title}</AlertDialogTitle>
-          <AlertDialogDescription>{description}</AlertDialogDescription>
+          <AlertDialogTitle className="text-xl font-bold bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 bg-clip-text text-transparent">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-gray-600 dark:text-gray-300">
+            {description}
+          </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>{cancelText}</AlertDialogCancel>
-          <AlertDialogAction className="bg-red-700 text-white" onClick={onConfirm}>{confirmText}</AlertDialogAction>
+        <AlertDialogFooter className="mt-4">
+          <AlertDialogCancel
+            className="
+              rounded-xl px-4 py-2 transition-all duration-300
+              hover:bg-gray-200/40 dark:hover:bg-zinc-800/50
+            "
+          >
+            {cancelText}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onConfirm}
+            className="
+              rounded-xl px-4 py-2 font-semibold text-white
+              bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400
+              shadow-md shadow-purple-500/20
+              transition-all duration-300 ease-in-out
+              hover:scale-105 hover:shadow-lg
+              focus:ring-2 focus:ring-purple-400 focus:outline-none
+            "
+          >
+            {confirmText}
+          </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

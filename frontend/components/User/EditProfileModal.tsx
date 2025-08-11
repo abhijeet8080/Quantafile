@@ -15,7 +15,7 @@ import uploadAvatar from "@/lib/upload-avatar";
 import { User } from "@/types/user";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { updateUser } from "@/lib/api/auth";
+import { updateUser } from "@/services/userServices";
 import Image from "next/image";
 
 interface Props {

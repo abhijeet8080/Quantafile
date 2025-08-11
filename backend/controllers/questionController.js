@@ -370,27 +370,7 @@ export const searchQuestions = async (req, res) => {
 };
 
 
-export const deleteQuestionAdmin = async (req, res) => {
-  try {
-    const question = await Question.findById(req.params.id);
-    if (!question) return res.status(404).json({ message: 'Question not found' });
 
-    await question.deleteOne();
-
-    // Save log
-    await Log.create({
-      action: 'DELETE_QUESTION',
-      targetId: question._id,
-      targetModel: 'Question',
-      reason: req.body.reason || 'Spam or offensive content',
-      performedBy: req.user._id,
-    });
-
-    res.json({ message: 'Question deleted and logged' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
 
 
 

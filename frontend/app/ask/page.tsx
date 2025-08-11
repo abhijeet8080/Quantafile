@@ -9,11 +9,11 @@ import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { Textarea } from "@/components/ui/textarea";
-import { createQuestion } from "@/lib/api/question";
+import { createQuestion } from "@/services/questionServices";
 import { useRequireAuth } from "@/hooks/userHooks";
 import { RequireAuthModal } from "@/components/RequireAuthModal ";
 export default function AskQuestionPage() {
-  const { isAuthenticated, showModal, setShowModal } = useRequireAuth();
+  const { isAuthenticated, showModal } = useRequireAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");

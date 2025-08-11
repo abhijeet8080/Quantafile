@@ -7,6 +7,8 @@ import userRoutes from './routes/userRoutes.js'
 import questionRoutes from './routes/questionRoutes.js'
 import answerRoutes from './routes/answerRoutes.js'
 import voteRoutes from "./routes/voteRoutes.js"
+import adminRoutes from "./routes/adminRoutes.js";
+
 dotenv.config();
 connectDB();
 
@@ -20,7 +22,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/answers', answerRoutes);
 app.use('/api/votes', voteRoutes);
-
+app.use("/api/admin", adminRoutes);
 
 
 export default app;
