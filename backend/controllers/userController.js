@@ -30,13 +30,13 @@ export const getUserDetails = async (req, res) => {
 export const getUserProfile = async (req, res) => {
   try {
     const id = req.params.id;
-
+    console.log('id',id)
     if (!id || !isValidObjectId(id)) {
       return res.status(400).json({ error: 'Invalid user ID' });
     }
 
     // Select fewer fields if exposing public profile
-    const publicProfileFields = '_id username avatar reputation createdAt';
+    const publicProfileFields = '_id username email avatar isBanned reputation createdAt isVerified';
 
     const user = await User.findById(id).select(publicProfileFields);
 

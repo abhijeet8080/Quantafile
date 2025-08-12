@@ -20,6 +20,7 @@ export default function ProfilePage() {
   const [openEdit, setOpenEdit] = useState(false);
   const loggedInUser = useSelector((state: RootState) => state.auth.user);
   const { user, loading, setUser } = useGetUserDetails(id,token);
+  console.log(user)
   const isOwnProfile = loggedInUser?._id==user?._id
   const handleProfileUpdate = (updatedUser: User) => {
     setUser(updatedUser);
@@ -35,7 +36,7 @@ export default function ProfilePage() {
 
   if (!user) {
     return (
-      <p className="text-center mt-16 text-muted-foreground text-lg font-medium">
+      <p className="text-center h-[100vh] mt-16 text-muted-foreground text-lg font-medium">
         User not found.
       </p>
     );

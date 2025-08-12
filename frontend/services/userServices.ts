@@ -2,9 +2,12 @@ import { api } from "@/lib/axios";
 import { ParamValue } from "next/dist/server/request/params";
 
 export async function getUserDetails(id: ParamValue, token?: string|null) {
+  console.log('token', token)
   return await api.get(`/users/profile/${id}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-  });
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 }
 
 
