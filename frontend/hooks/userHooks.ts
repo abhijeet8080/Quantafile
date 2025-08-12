@@ -7,7 +7,7 @@ import { ParamValue } from "next/dist/server/request/params";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
-export function useGetUserDetails(id: ParamValue) {
+export function useGetUserDetails(id: ParamValue, token:string|null) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -19,14 +19,14 @@ export function useGetUserDetails(id: ParamValue) {
     }
 
     setLoading(true);
-    getUserDetails(id)
+    getUserDetails(id,token)
       .then((res) => setUser(res.data))
       .catch((err) => {
         console.error("Failed to fetch user details", err);
         setUser(null);
       })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id,token]);
 
   return { user, loading,setUser };
 }

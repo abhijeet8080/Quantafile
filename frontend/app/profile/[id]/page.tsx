@@ -15,11 +15,11 @@ import { RequireAuthModal } from "@/components/RequireAuthModal ";
 
 export default function ProfilePage() {
     const { isAuthenticated, showModal } = useRequireAuth();
-  
+    const token = useSelector((state:RootState)=>state.auth.token)
   const { id } = useParams();
   const [openEdit, setOpenEdit] = useState(false);
   const loggedInUser = useSelector((state: RootState) => state.auth.user);
-  const { user, loading, setUser } = useGetUserDetails(id);
+  const { user, loading, setUser } = useGetUserDetails(id,token);
   const isOwnProfile = loggedInUser?._id==user?._id
   const handleProfileUpdate = (updatedUser: User) => {
     setUser(updatedUser);

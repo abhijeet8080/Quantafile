@@ -1,49 +1,56 @@
 import User  from '../models/User.js';
 
+import mongoose from 'mongoose';
+
+const userSelectFields = '_id username email avatar reputation role isVerified isBanned createdAt updatedAt';
+
+const isValidObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
+
 export const getUserDetails = async (req, res) => {
   try {
-    console.log("get user details called")
-    const {id} = req.user
-    if (!id || id.length !== 24) {
-      return res.status(400).json({ message: 'Invalid user ID' });
+    const id = req.user?.id;
+
+    if (!id || !isValidObjectId(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
     }
 
-    const user = await User.findById(id).select('-password');
+    const user = await User.findById(id).select(userSelectFields);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.status(404).json({ error: 'User not found' });
     }
-    res.status(200).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      avatar: user.avatar,
-      reputation: user.reputation,
-      role: user.role,
-      isVerified: user.isVerified,
-      isBanned: user.isBanned,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt
-    });
-  } catch (err) {
-    console.error('Error fetching user:', err.message);
-    res.status(500).json({ message: 'Server error', error: err.message });
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error in getUserDetails:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
-
-
 
 export const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
-    
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const id = req.params.id;
 
-    res.json(user);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
+    if (!id || !isValidObjectId(id)) {
+      return res.status(400).json({ error: 'Invalid user ID' });
+    }
+
+    // Select fewer fields if exposing public profile
+    const publicProfileFields = '_id username avatar reputation createdAt';
+
+    const user = await User.findById(id).select(publicProfileFields);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 
 export const updateUserProfile = async (req, res) => {
